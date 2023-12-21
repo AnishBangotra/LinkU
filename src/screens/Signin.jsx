@@ -20,7 +20,7 @@ const Signin = ({navigation}) => {
     const [password, setPassword] = useState('');
     const [usernameError, setUsernameError] = useState('');
     const [passwordError, setPasswordError] = useState('');
-
+    const [responseError, setResponseError] = useState('');
     const login = useGlobal(state => state.login)
 
     useLayoutEffect(() => {
@@ -56,16 +56,20 @@ const Signin = ({navigation}) => {
             }
             utils.log('SignIn', response.data)
             login(credentials, response.data.user, response.data.tokens)
+            setResponseError('')
         }
         ).catch(error => {
             if (error.response) {
                 // console.log(error.response.data);
                 console.log(error.response.status);
+                if (error.response.status === 401) {
+                    setResponseError('Incorrect Username or Password')
+                }
             //     console.log(error.response.headers);
               } else if (error.request) {
                 console.log(error.request);
               } else {
-                console.log('Error', error.message);
+                console.log(error.message);
               }
               console.log(error.config);
         });
@@ -97,6 +101,7 @@ const Signin = ({navigation}) => {
                             setError={setPasswordError}
                             secureTextEntry={true}
                         />
+                        {responseError.length > 0 ? <Text style={{color: 'red', marginLeft: 3, marginTop: 3}}>{responseError}</Text> : null}
                         <Button title="Sign In" onPress={onSignin}/>
                         <Text style={{ textAlign: 'center', marginTop: 20 }}>
                             Don't have an account? <Text 

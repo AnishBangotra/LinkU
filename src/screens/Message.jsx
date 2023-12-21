@@ -3,7 +3,6 @@ import {
   SafeAreaView, 
   View,
   InputAccessoryView,
-  Keyboard,
   FlatList,
   Animated,
   Easing,
@@ -13,15 +12,45 @@ import {
   Text
 } from 'react-native'
 import Thumbnail from '../components/Thumbnail'
+import ModalComponent from '../components/ModalComponent'
 import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome'
 import useGlobal from '../core/global'
 
-function MessageHeader({ friend }) {
+function renderComponent() {
+	const unlinkText = 'Unlink';
+	return(
+			<View
+				style={{
+					borderColor: 'rgba(52, 52, 52, 0.8)',
+					backgroundColor: '#fff',
+					width: 80,
+				}}>
+				<Text
+					style={{
+						fontSize: 16,
+						color: 'red',
+						textAlign: 'center'
+					}}>
+				{unlinkText}
+				</Text>
+					
+			</View>
+	)
+}
+
+
+
+function MessageHeader({ friend, showModal, setModal }) {
+
+  const onClick = () => {
+	setModal(!showModal)
+  }
   return(
     <View style={{
       flex: 1,
       flexDirection: 'row',
-      alignItems: 'center'
+	  width: '100%',
+      alignItems: 'center',
     }}>
       <Thumbnail 
         url={friend.thumbnail}
@@ -37,10 +66,17 @@ function MessageHeader({ friend }) {
       >
         {friend.name}
       </Text>
+	  <TouchableOpacity onPress={() => onClick()}
+	  	style={{
+			position: 'absolute',
+			right: 10,
+		}}
+	  >
+		{renderComponent()}
+	  </TouchableOpacity>
     </View>
   )
 }
-
 
 
 function MessageBubbleMe({ text }) {
@@ -75,13 +111,9 @@ function MessageBubbleMe({ text }) {
 					{text}
 				</Text>
 			</View>
-			
 		</View>
 	)
 }
-
-
-
 
 
 function MessageTypingAnimation({ offset }) {
@@ -135,8 +167,6 @@ function MessageTypingAnimation({ offset }) {
 }
 
 
-
-
 function MessageBubbleFriend({ text, friend, typing=false }) {
   if (text === undefined) return
 	return (
@@ -188,6 +218,7 @@ function MessageBubbleFriend({ text, friend, typing=false }) {
 	)
 }
 
+
 function MessageBubble({ index, message, friend }) {
 	const [showTyping, setShowTyping] = useState(false)
 
@@ -224,6 +255,7 @@ function MessageBubble({ index, message, friend }) {
 		<MessageBubbleFriend text={message.text} friend={friend} />
 	)
 }
+
 
 function MessageInput({ message, setMessage, onSend}) {
   return (
@@ -266,9 +298,11 @@ function MessageInput({ message, setMessage, onSend}) {
   )
 }
 
+
 const MessageScreen = ({navigation, route}) => {
   const [message, setMessage] = useState('')
-
+  const [showModal, setModal] = useState(false);
+  const friendList = useGlobal(state => state.friendList)
   const messagesList = useGlobal(state => state.messagesList)
   const messageList = useGlobal(state => state.messageList)
   const messageSend = useGlobal(state => state.messageSend)
@@ -279,7 +313,7 @@ const MessageScreen = ({navigation, route}) => {
   useLayoutEffect(() => {
     navigation.setOptions({
       headerTitle: () => (
-        <MessageHeader friend={friend} />
+        <MessageHeader friend={friend} showModal={showModal} setModal={setModal} />
       )
     })
   }, [])
@@ -288,7 +322,7 @@ const MessageScreen = ({navigation, route}) => {
     messageList(connectionId)
   }, [])
 
-  function onSend() {
+  	function onSend() {
 		const cleaned = message.replace(/\s+/g, ' ').trim()
 		if (cleaned.length === 0) return
 		messageSend(connectionId, cleaned)
@@ -300,6 +334,11 @@ const MessageScreen = ({navigation, route}) => {
 		// messageType(friend.username)
 	}
 
+	function ulinkConnection() {
+		console.log('listttttttttttttt', friendList)
+		alert('remove')
+	}
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
         <View
@@ -307,7 +346,8 @@ const MessageScreen = ({navigation, route}) => {
             flex: 1
           }}
         >
-          <FlatList
+		<ModalComponent showModal={showModal} child={ulinkConnection} setModal={setModal} /> 
+        <FlatList
             automaticallyAdjustKeyboardInsets={true}
             contentContainerStyle={{
               paddingTop: 30
@@ -327,7 +367,7 @@ const MessageScreen = ({navigation, route}) => {
                 friend={friend}
               />
             )}
-          />
+        />
         </View>
         {Platform.OS === 'ios' ? (
 				<InputAccessoryView>

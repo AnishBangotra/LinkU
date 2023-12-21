@@ -59,6 +59,10 @@ function responseMessageSend(set, get, data) {
 	}))
 }
 
+function responseRequestUnlink(set, get, connection) {
+    const user = get().user
+    const friendList = useGlobal(state => state.friendList)
+}
 
 function responseRequestAccept(set, get, connection) {
     const user = get().user
@@ -245,6 +249,7 @@ const useGlobal = create((set, get) => ({
                 'friend.list': responseFriendList,
                 'friend.new': responseFriendNew,
                 'request.accept': responseRequestAccept,
+                'request.unlink':responseRequestUnlink,
                 'request.list': responseRequestList,
                 'request.connect': responseRequestConnect,
                 'search': responseSearch,
@@ -353,6 +358,14 @@ const useGlobal = create((set, get) => ({
             username: username
         }))
 	},
+
+    requestUnlink: (username) => {
+        const socket = get().socket
+        socket.send(JSON.stringify({
+            source: 'request.unlink',
+            username: username
+        }))
+    },
 
 	requestConnect: (username) => {
 		const socket = get().socket
