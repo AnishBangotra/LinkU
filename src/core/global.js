@@ -316,8 +316,8 @@ const useGlobal = create((set, get) => ({
 
     messagesList: [],
     messagesNext: null,
-	messagesTyping: null,
-	messagesUsername: null,
+    messagesTyping: null,
+    messagesUsername: null,
 
     messageList: (connectionId, page=0) => {
         if (page === 0) {
@@ -325,7 +325,7 @@ const useGlobal = create((set, get) => ({
                 messagesList: [],
                 messagesNext: null,
                 messagesTyping: null,
-				messagesUsername: null
+		messagesUsername: null
             }))
         }
         const socket = get().socket
